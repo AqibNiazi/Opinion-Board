@@ -1,8 +1,8 @@
 import { useFormStatus } from "react-dom";
 import React from "react";
-const { pending } = useFormStatus();
 
 const Submit = () => {
+  const { pending } = useFormStatus();
   return (
     <p className="actions">
       <button type="submit" disabled={pending}>
