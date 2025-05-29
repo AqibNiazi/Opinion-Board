@@ -1,17 +1,32 @@
-import { use, useActionState } from "react";
+import { use, useActionState, useOptimistic } from "react";
 import { OpinionsContext } from "../store/opinions-context";
 export function Opinion({ opinion: { id, title, body, userName, votes } }) {
   const { upvoteOpinion, downvoteOpinion } = use(OpinionsContext);
-  const upVoteAction = async () => {
+
+  const [optimisticVotes, setVotesOptimistically] = useOptimistic(
+    votes,
+    (prevVotes, mode) => (mode === "up" ? prevVotes + 1 : prevVotes - 1)
+  );
+
+  const upvoteAction = async () => {
     // This function will be called when the upvote button is clicked.
+    setVotesOptimistically("up");
+    // Optimistically update the votes count.
+    // This is where you would typically call an API to update the opinion's votes.
     await upvoteOpinion(id);
   };
-  const downVoteAction = async () => {
+  const downvoteAction = async () => {
     // This function will be called when the downvote button is clicked.
+    setVotesOptimistically("down");
+    // Optimistically update the votes count.
+    // This is where you would typically call an API to update the opinion's votes.
     await downvoteOpinion(id);
   };
 
-  const { isPending } = useActionState(upVoteAction, downVoteAction);
+  const { upvoteFormState, upvoteFormAction, upvotePending } =
+    useActionState(upvoteAction);
+  const { downvoteFormState, downvoteFormAction, downvotePending } =
+    useActionState(downvoteAction);
 
   return (
     <article>
@@ -21,7 +36,10 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
       </header>
       <p>{body}</p>
       <form className="votes">
-        <button formAction={upVoteAction} disabled={isPending}>
+        <button
+          formAction={upvoteAction}
+          disabled={upvotePending || downvotePending}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -39,9 +57,12 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
           </svg>
         </button>
 
-        <span>{votes}</span>
+        <span>{optimisticVotes}</span>
 
-        <button formAction={downVoteAction} disabled={isPending}>
+        <button
+          formAction={downvoteAction}
+          disabled={downvotePending || upvotePending}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
