@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "builds": [{ "src": "api/opinions.js", "use": "@vercel/node" }],
+  "routes": [
+    {
+      "src": "/opinions",
+      "methods": ["GET", "POST", "OPTIONS"],
+      "dest": "/api/opinions.js"
+    },
+    {
+      "src": "/opinions/:id/(upvote|downvote)",
+      "methods": ["POST", "OPTIONS"],
+      "dest": "/api/opinions.js"
+    }
+  ]
+}
