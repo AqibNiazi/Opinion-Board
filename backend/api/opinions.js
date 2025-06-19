@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
   async function loadOpinions() {
     try {
-      const dbFileData = await fs.readFile("backend/db.json");
+      const dbFileData = await fs.readFile("db.json");
       const parsedData = JSON.parse(dbFileData);
       return parsedData.opinions;
     } catch (error) {
